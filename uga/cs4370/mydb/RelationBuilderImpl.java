@@ -1,11 +1,6 @@
-package uga.cs4370;
+package uga.cs4370.mydb;
 
 import java.util.List;
-
-import uga.cs4370.mydb.Relation;
-import uga.cs4370.mydb.RelationImpl;
-import uga.cs4370.mydb.RelationBuilder;
-import uga.cs4370.mydb.Type;
 
 public class RelationBuilderImpl implements RelationBuilder {
 
