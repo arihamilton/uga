@@ -9,7 +9,6 @@ import java.util.List;
 public class RelationImpl implements Relation {
 
     private String name;
-    private int size;
     private List<String> attrs = new ArrayList<String>();
     private List<Type> types = new ArrayList<Type>();
 
@@ -34,7 +33,7 @@ public class RelationImpl implements Relation {
      * Returns the row count of the relation.
      */
     public int getSize(){
-        return size;
+        return rows.size();
     }
 
     /**
