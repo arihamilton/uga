@@ -53,6 +53,8 @@ public class Tester {
         System.out.println("gender is at index " + rel.getAttrIndex("gender"));
         System.out.println("dept is at index " + rel.getAttrIndex("dept"));
 
+        System.out.println("relation is of size " + rel.getSize());
+
 
     }
     
