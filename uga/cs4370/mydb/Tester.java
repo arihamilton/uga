@@ -15,6 +15,7 @@ public class Tester {
 
         // RelationBuilderImpl is not implemented yet, so that is why manual setters are used
         // Do not use manual setters in actual project
+        // Change to Relation rel = rb.newRelation() once RelationBuilderImpl is implemented
 
         rel.setName("relation1");
         List<String> attrs = new ArrayList<String>();
