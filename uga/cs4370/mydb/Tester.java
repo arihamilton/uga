@@ -1,6 +1,7 @@
 package uga.cs4370.mydb;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import uga.cs4370.mydb.Relation;
@@ -11,26 +12,8 @@ public class Tester {
 
     public static void main(String[] args) {
         
-        RelationImpl rel = new RelationImpl();
-
-        // RelationBuilderImpl is not implemented yet, so that is why manual setters are used
-        // Do not use manual setters in actual project
-        // Change to Relation rel = rb.newRelation() once RelationBuilderImpl is implemented
-
-        rel.setName("relation1");
-        List<String> attrs = new ArrayList<String>();
-        attrs.add("id");
-        attrs.add("name");
-        attrs.add("gender");
-        attrs.add("dept");
-        rel.setAttrs(attrs);
-
-        List<Type> types = new ArrayList<Type>();
-        types.add(Type.INTEGER);
-        types.add(Type.STRING);
-        types.add(Type.STRING);
-        types.add(Type.STRING);
-        rel.setTypes(types);
+        RelationBuilder rb = new RelationBuilderImpl();
+        Relation rel = rb.newRelation("relation1", Arrays.asList("id", "name", "gender", "dept"), Arrays.asList(Type.INTEGER, Type.STRING, Type.STRING, Type.STRING));
 
         List<Cell> row = new ArrayList<Cell>();
         row.add(new Cell(1));
