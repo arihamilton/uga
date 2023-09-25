@@ -1,43 +1,63 @@
 package uga.cs4370.mydb;
 
-import uga.cs4370.mydb.Cell;
-import uga.cs4370.mydb.Predicate;
-
 import java.util.List;
 
 public class PredicateImpl implements Predicate {
 
-	private int index; 
-	private Object target;
+    public enum ComparisonOperator {
+        EQUALS,
+        DOES_NOT_EQUALS,
+        GREATER_THAN,
+        LESS_THAN,
+        GREATER_THAN_OR_EQUAL_TO,
+        LESS_THAN_OR_EQUAL_TO
+    }
 
-	public int getIndex() {
-		return index;
-	}
+    private int index;
+    private Object target;
+    private ComparisonOperator operator;
 
-	public void setIndex(int index) {
-		this.index = index;
-	}
+    PredicateImpl(int index, Object target, ComparisonOperator operator) {
+        this.index = index;
+        this.target = target;
+        this.operator = operator;
+    }
 
-	public Object getTarget() {
-		return target;
-	}
+    @Override
+    public boolean check(List<Cell> row) {
+        int numRows = row.size();
 
-	public void setTarget(Object target) {
-		this.target = target;
-	}
- 
-	@Override
-	public boolean check(List<Cell> row) {
+        if (index < 0 || index >= numRows) {
+            throw new IllegalArgumentException("Invalid index");
+        }
 
-		int numberRows = row.size();
-		
-		if(index < 0 || index >= numberRows) {
-			throw new IllegalArgumentException("Invalid index");
-		}
+        Cell cell = row.get(index);
 
-		Cell cell = row.get(index);
-		
-        return cell.getAsString().equals(target.toString());
-	}
-	
+        if (cell.getType() == Type.STRING) {
+            switch (operator) {
+                case EQUALS:
+                    return cell.toString().equals(target.toString());
+                case DOES_NOT_EQUALS:
+                    return !cell.toString().equals(target.toString());
+            }
+        } else if (cell.getType() == Type.INTEGER || cell.getType() == Type.DOUBLE) {
+            double cellNumber = cell.getAsDouble();
+            double targetNumber = Double.parseDouble(target.toString());
+            switch (operator) {
+                case EQUALS:
+                    return cellNumber == targetNumber;
+                case DOES_NOT_EQUALS:
+                    return cellNumber != targetNumber;
+                case GREATER_THAN:
+                    return cellNumber > targetNumber;
+                case LESS_THAN:
+                    return cellNumber < targetNumber;
+                case GREATER_THAN_OR_EQUAL_TO:
+                    return cellNumber >= targetNumber;
+                case LESS_THAN_OR_EQUAL_TO:
+                    return cellNumber <= targetNumber;
+            }
+        }
+        throw new IllegalArgumentException("Unsupported data type in the cell.");
+    }
 }
