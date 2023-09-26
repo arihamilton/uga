@@ -96,7 +96,63 @@ public class Tester {
         Relation relCarP = ra.cartesianProduct(relInstructor, relTeaches);
         System.out.println(relCarP.getName());
         relCarP.print();
+
+        ///////////////////////////
         
+
+        RelationBuilder professors = new RelationBuilderImpl();
+        Relation professorsRel = professors.newRelation("Professors", Arrays.asList("ProfessorID", "FName", "LName", "Department"), Arrays.asList(Type.INTEGER, Type.STRING, Type.STRING, Type.STRING));
+
+
+        List<Cell> professorsRow = new ArrayList<Cell>();
+        professorsRow.add(new Cell(4321)); 
+        professorsRow.add(new Cell("Robert"));
+        professorsRow.add(new Cell("Jones"));
+        professorsRow.add(new Cell("Computer Science")); 
+        professorsRel.insert(professorsRow);
+
+        List<Cell> professorsRow2 = new ArrayList<Cell>();
+        professorsRow2.add(new Cell(4322)); 
+        professorsRow2.add(new Cell("Samantha"));
+        professorsRow2.add(new Cell("Hall"));
+        professorsRow2.add(new Cell("Mathematics")); 
+        professorsRel.insert(professorsRow2);
+
+        List<Cell> professorsRow3 = new ArrayList<Cell>();
+        professorsRow3.add(new Cell(4323)); 
+        professorsRow3.add(new Cell("Vietmy"));
+        professorsRow3.add(new Cell("Vo"));
+        professorsRow3.add(new Cell("Computer Science")); 
+        professorsRel.insert(professorsRow3);
+
+        professorsRel.print();
+
+        PredicateImpl predicate;
+        predicate = new PredicateImpl(0, 4321, PredicateImpl.ComparisonOperator.EQUALS);
+        System.out.println(predicate.check(professorsRow));
+
+        RelationBuilder teaches = new RelationBuilderImpl();
+        Relation teachesRel = teaches.newRelation("Teaches", Arrays.asList("TeachID", "ProfessorID", "CourseID"), Arrays.asList(Type.INTEGER, Type.INTEGER, Type.INTEGER));
+
+        List<Cell> teachesRow = new ArrayList<Cell>();
+        teachesRow.add(new Cell(1)); 
+        teachesRow.add(new Cell(4321));
+        teachesRow.add(new Cell(1000));
+        teachesRel.insert(teachesRow);
+
+        List<Cell> teachesRow2 = new ArrayList<Cell>();
+        teachesRow2.add(new Cell(2)); 
+        teachesRow2.add(new Cell(4323));
+        teachesRow2.add(new Cell(3000));
+        teachesRel.insert(teachesRow2);
+
+        List<Cell> teachesRow3 = new ArrayList<Cell>();
+        teachesRow3.add(new Cell(3)); 
+        teachesRow3.add(new Cell(4322));
+        teachesRow3.add(new Cell(4000));
+        teachesRel.insert(teachesRow3);
+
+        teachesRel.print();
 
 
     }
