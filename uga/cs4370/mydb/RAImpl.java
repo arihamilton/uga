@@ -168,6 +168,59 @@ public class RAImpl implements RA {
      * @throws IllegalArgumentException if rel1 and rel2 have common attibutes.
      */
     public Relation cartesianProduct(Relation rel1, Relation rel2) {
+
+        //check for compatible attributes
+        if (rel1.getAttrs().equals(rel2.getAttrs())) throw new IllegalArgumentException("The relations have common attributes.");
+
+        List<String> newAttrs = new ArrayList<String>();
+        List<Type> newTypes = new ArrayList<Type>();
+
+        // Add attributes from rel1 to new attribute list
+        // If attr in rel1 exists in rel2, change its name
+        for (String attr : rel1.getAttrs()) {
+            if (rel2.getAttrs().contains(attr)) {
+                newAttrs.add(rel1.getName() + attr);
+            }
+            else {
+                newAttrs.add(attr);
+            }
+        }
+        // Add attributes from rel2 to new attribute list
+        // If attr in rel2 exists in rel1, change its name
+        for (String attr : rel2.getAttrs()) {
+            if (rel1.getAttrs().contains(attr)) {
+                newAttrs.add(rel2.getName() + attr);
+            }
+            else {
+                newAttrs.add(attr);
+            }
+        }
+        // Add types from rel1 and rel2 to new type list
+        for (Type type : rel1.getTypes()) {
+            newTypes.add(type);
+        }
+        for (Type type : rel2.getTypes()) {
+            newTypes.add(type);
+        }
+
+        Relation newRel = rb.newRelation(rel1.getName() + "x" + rel2.getName(), newAttrs, newTypes);
+
+        // For each row in rel1, add (row * all rows in rel2) to new relation
+        for (List<Cell> row : rel1.getRows()) {
+
+            for (List<Cell> row2 : rel2.getRows()) {
+                List<Cell> newRow = new ArrayList<Cell>();
+                for (Cell cell : row) {
+                    newRow.add(cell);
+                }
+                for (Cell cell2 : row2) {
+                    newRow.add(cell2);
+                }
+                newRel.insert(newRow);
+            }
+
+        }
+        return newRel;
  
     }
 

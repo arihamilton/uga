@@ -82,6 +82,22 @@ public class Tester {
         Relation relDiff = ra.diff(rel, rel3);
         relDiff.print();
 
+        // Cartesian Product
+
+        System.out.println("Cartesian Product: ");
+        Relation relInstructor = rb.newRelation("Instructor", Arrays.asList("id", "name", "deptName"), Arrays.asList(Type.INTEGER, Type.STRING, Type.STRING));
+        relInstructor.insert(Arrays.asList(new Cell(22222), new Cell("Einstein"), new Cell("Physics")));
+        relInstructor.insert(Arrays.asList(new Cell(12121), new Cell("Wu"), new Cell("Finance")));
+
+        Relation relTeaches = rb.newRelation("Teaches", Arrays.asList("id", "courseId", "semester"), Arrays.asList(Type.INTEGER, Type.STRING, Type.STRING));
+        relTeaches.insert(Arrays.asList(new Cell(22222), new Cell("PHY-101"), new Cell("Fall")));
+        relTeaches.insert(Arrays.asList(new Cell(12121), new Cell("FIN-201"), new Cell("Spring")));
+
+        Relation relCarP = ra.cartesianProduct(relInstructor, relTeaches);
+        System.out.println(relCarP.getName());
+        relCarP.print();
+        
+
 
     }
     
