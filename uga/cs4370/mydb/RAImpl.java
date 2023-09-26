@@ -105,6 +105,22 @@ public class RAImpl implements RA {
      * @throws IllegalArgumentException If rel1 and rel2 are not compatible.
      */
     public Relation diff(Relation rel1, Relation rel2) {
+        //check for compatible attributes
+        if (!rel1.getAttrs().equals(rel2.getAttrs())) throw new IllegalArgumentException("The relations do not have compatible attributes.");
+
+        List<List<Cell>> rel1Rows = rel1.getRows();
+        List<List<Cell>> rel2Rows = rel2.getRows();
+
+        Relation newRel = rb.newRelation(rel1.getName(), rel1.getAttrs(), rel2.getTypes());
+
+        // If row exists in rel1 but not rel2, add it to the new relation
+        for (int i = 0; i < rel1Rows.size(); i++) {
+            if (!(rel2Rows.contains(rel1Rows.get(i)))) {
+                newRel.insert(rel1Rows.get(i));
+            }
+        }
+
+        return newRel;
 
     }
 
@@ -126,18 +142,18 @@ public class RAImpl implements RA {
         if (origAttr.size() != renamedAttr.size()) throw new IllegalArgumentException("Renamed and original attribute lists are not equal size.");
 
         //alter attribute list
-        List<String> attrList = rel.getAttrs();
+        // List<String> attrList = rel.getAttrs();
 
-        for (int c = 0; c < origAttr.size(); c++) {
-            for (int c2 = 0; c2 < attrList.size(); c2++) {
-                if (origAttr.get(c).equals(attrList.get(c2))) {
-                    attrList.set(c2, renamedAttr.get(c));
-                }
-            }
-        }
+        // for (int c = 0; c < origAttr.size(); c++) {
+        //     for (int c2 = 0; c2 < attrList.size(); c2++) {
+        //         if (origAttr.get(c).equals(attrList.get(c2))) {
+        //             attrList.set(c2, renamedAttr.get(c));
+        //         }
+        //     }
+        // }
 
         //create and return new relation
-        Relation newRel = rb.newRelation(rel.getName(), attrList, rel.getTypes());
+        Relation newRel = rb.newRelation(rel.getName(), renamedAttr, rel.getTypes());
         for (List<Cell> row : rel.getRows()) {
             newRel.insert(row);
         }

@@ -58,7 +58,6 @@ public class Tester {
 
         // Union
 
-
         System.out.println("Union: ");
         Relation relNew = rb.newRelation("relation2", Arrays.asList("id", "name", "gender", "dept"), Arrays.asList(Type.INTEGER, Type.STRING, Type.STRING, Type.STRING));
         relNew.insert(Arrays.asList(new Cell(3), new Cell("Ravaan"), new Cell("m"), new Cell("Mechanical") ));
@@ -71,6 +70,18 @@ public class Tester {
         System.out.println("Rename dept to department: ");
         Relation relRename = ra.rename(rel, rel.getAttrs(),  Arrays.asList("id", "name", "gender", "department"));
         relRename.print();
+
+        // Diff
+
+        System.out.println("Diff: ");
+
+        Relation rel3 = rb.newRelation("relation3", Arrays.asList("id", "name", "gender", "dept"), Arrays.asList(Type.INTEGER, Type.STRING, Type.STRING, Type.STRING));
+        rel3.insert(Arrays.asList(new Cell(1), new Cell("Ram"), new Cell("m"), new Cell("Information Technology") ));
+        rel.print();
+        rel3.print();
+        Relation relDiff = ra.diff(rel, rel3);
+        relDiff.print();
+
 
     }
     
