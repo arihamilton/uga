@@ -40,8 +40,25 @@ public class PredicateImpl implements Predicate {
                 case DOES_NOT_EQUALS:
                     return !cell.toString().equals(target.toString());
             }
-        } else if (cell.getType() == Type.INTEGER || cell.getType() == Type.DOUBLE) {
+        } else if (cell.getType() == Type.DOUBLE) {
             double cellNumber = cell.getAsDouble();
+            double targetNumber = Double.parseDouble(target.toString());
+            switch (operator) {
+                case EQUALS:
+                    return cellNumber == targetNumber;
+                case DOES_NOT_EQUALS:
+                    return cellNumber != targetNumber;
+                case GREATER_THAN:
+                    return cellNumber > targetNumber;
+                case LESS_THAN:
+                    return cellNumber < targetNumber;
+                case GREATER_THAN_OR_EQUAL_TO:
+                    return cellNumber >= targetNumber;
+                case LESS_THAN_OR_EQUAL_TO:
+                    return cellNumber <= targetNumber;
+            }
+        } else if (cell.getType() == Type.INTEGER) {
+            double cellNumber = cell.getAsInt();
             double targetNumber = Double.parseDouble(target.toString());
             switch (operator) {
                 case EQUALS:
