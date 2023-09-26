@@ -225,12 +225,67 @@ public class RAImpl implements RA {
     }
 
     /**
-     * Peforms natural join on relations rel1 and rel2.
+     * Performs natural join on relations rel1 and rel2.
      * 
      * @return The resulting relation after applying natural join.
      */
+    
     public Relation join(Relation rel1, Relation rel2) {
+        // Check for compatible attributes
+        List<String> commonAttrs = new ArrayList<>(rel1.getAttrs());
+        commonAttrs.retainAll(rel2.getAttrs());
 
+        // If there are no common attributes, throw an exception
+        if (commonAttrs.isEmpty()) {
+            throw new IllegalArgumentException("The relations have no common attributes for natural join.");
+        }
+
+        List<String> newAttrs = new ArrayList<>();
+        List<Type> newTypes = new ArrayList<>();
+
+        // Add attributes from rel1 to new attribute list
+        for (String attr : rel1.getAttrs()) {
+            if (!commonAttrs.contains(attr)) {
+                newAttrs.add(rel1.getName() + attr);
+                newTypes.add(rel1.getTypes().get(rel1.getAttrs().indexOf(attr)));
+            }
+        }
+
+        // Add attributes from rel2 to new attribute list
+        for (String attr : rel2.getAttrs()) {
+            if (!commonAttrs.contains(attr)) {
+                newAttrs.add(rel2.getName() + attr);
+                newTypes.add(rel2.getTypes().get(rel2.getAttrs().indexOf(attr)));
+            }
+        }
+
+        Relation newRel = rb.newRelation(rel1.getName() + "Join" + rel2.getName(), newAttrs, newTypes);
+
+        // For each row in rel1, join with rows from rel2 based on common attributes
+        for (List<Cell> row1 : rel1.getRows()) {
+            for (List<Cell> row2 : rel2.getRows()) {
+                boolean canJoin = true;
+                for (String attr : commonAttrs) {
+                    int index1 = rel1.getAttrs().indexOf(attr);
+                    int index2 = rel2.getAttrs().indexOf(attr);
+                    if (!row1.get(index1).equals(row2.get(index2))) {
+                        canJoin = false;
+                        break;
+                    }
+                }
+                if (canJoin) {
+                    List<Cell> newRow = new ArrayList<>(row1);
+                    for (int i = 0; i < row2.size(); i++) {
+                        if (!commonAttrs.contains(rel2.getAttrs().get(i))) {
+                            newRow.add(row2.get(i));
+                        }
+                    }
+                    newRel.insert(newRow);
+                }
+            }
+        }
+
+        return newRel;
     }
 
     /**
@@ -238,7 +293,40 @@ public class RAImpl implements RA {
      * 
      * @return The resulting relation after applying theta join.
      */
-    public Relation join(Relation rel1, Relation rel2, Predicate p) {
 
+    public Relation join(Relation rel1, Relation rel2, Predicate p) {
+        // Check for compatible attributes
+        // Assume that the common attributes are determined based on the predicate p
+
+        List<String> newAttrs = new ArrayList<>();
+        List<Type> newTypes = new ArrayList<>();
+
+        // Add attributes from rel1 to new attribute list
+        for (String attr : rel1.getAttrs()) {
+            newAttrs.add(rel1.getName() + attr);
+            newTypes.add(rel1.getTypes().get(rel1.getAttrs().indexOf(attr)));
+        }
+
+        // Add attributes from rel2 to new attribute list
+        for (String attr : rel2.getAttrs()) {
+            newAttrs.add(rel2.getName() + attr);
+            newTypes.add(rel2.getTypes().get(rel2.getAttrs().indexOf(attr)));
+        }
+
+        Relation newRel = rb.newRelation(rel1.getName() + "Join" + rel2.getName(), newAttrs, newTypes);
+
+        // For each combination of rows from rel1 and rel2, apply the predicate
+        for (List<Cell> row1 : rel1.getRows()) {
+            for (List<Cell> row2 : rel2.getRows()) {
+                List<Cell> combinedRow = new ArrayList<>(row1);
+                combinedRow.addAll(row2);
+
+                if (p.check(combinedRow)) {
+                    newRel.insert(combinedRow);
+                }
+            }
+        }
+
+        return newRel;
     }
 }

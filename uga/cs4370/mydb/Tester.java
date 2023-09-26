@@ -96,7 +96,7 @@ public class Tester {
         Relation relCarP = ra.cartesianProduct(relInstructor, relTeaches);
         System.out.println(relCarP.getName());
         relCarP.print();
-
+        
         ///////////////////////////
         
 
@@ -154,6 +154,7 @@ public class Tester {
 
         teachesRel.print();
 
+        
 
     }
     
