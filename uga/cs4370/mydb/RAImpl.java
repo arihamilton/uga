@@ -1,5 +1,6 @@
 package uga.cs4370.mydb;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RAImpl implements RA {
@@ -35,14 +36,31 @@ public class RAImpl implements RA {
      * @throws IllegalArgumentException If attributes in attrs are not 
      * present in rel.
      */
-    public Relation project(Relation rel, List<String> attrs) throws IllegalArgumentException {    
+    public Relation project(Relation rel, List<String> attrs) throws IllegalArgumentException { 
+        
+        List<Integer> indices = new ArrayList<Integer>();
+        List<Type> types = new ArrayList<Type>();
+        
         for (int c = 0; c < attrs.size(); c++) {
             if (rel.hasAttr(attrs.get(c))) {
-                //I have absoutely no idea how to implement this function.
+                indices.add(rel.getAttrIndex(attrs.get(c)));
+                types.add(rel.getTypes().get(c));
             }
-            else throw new IllegalAccessError("Relation does not contain input attributes");
-             
+            else throw new IllegalArgumentException("Relation does not contain input attributes");
         }
+
+        Relation newRel = rb.newRelation(rel.getName(), attrs, types);
+
+        // Add rows only containing projected attributes to new relation
+        for (List<Cell> row : rel.getRows()) {
+            List<Cell> newRow = new ArrayList<Cell>();
+            for (Integer index : indices) {
+                newRow.add(row.get(index));
+            }
+            newRel.insert(newRow);
+        }
+
+        return newRel;
     }
 
     /**
@@ -62,7 +80,7 @@ public class RAImpl implements RA {
         for (int c = 0; c < rel2list.size(); c++) {
             boolean dupe = false;
             for (int c2 = 0; c2 < rowlist.size(); c2++) {
-                if (!rowlist.get(c2).equals(rel2list.get(c))){
+                if (rowlist.get(c2).equals(rel2list.get(c))){
                     dupe = true;
                 }
             }
@@ -102,7 +120,7 @@ public class RAImpl implements RA {
     public Relation rename(Relation rel, List<String> origAttr, List<String> renamedAttr) throws IllegalArgumentException {
         //check to see if attribute list is valid
         for (int c = 0; c < origAttr.size(); c++) {
-            if (!rel.hasAttr(origAttr.get(c))) throw new IllegalArgumentException("Attributes to be renamed do not exist")
+            if (!rel.hasAttr(origAttr.get(c))) throw new IllegalArgumentException("Attributes to be renamed do not exist");
         }
 
         if (origAttr.size() != renamedAttr.size()) throw new IllegalArgumentException("Renamed and original attribute lists are not equal size.");
@@ -120,6 +138,9 @@ public class RAImpl implements RA {
 
         //create and return new relation
         Relation newRel = rb.newRelation(rel.getName(), attrList, rel.getTypes());
+        for (List<Cell> row : rel.getRows()) {
+            newRel.insert(row);
+        }
         return newRel;
     }
 

@@ -7,6 +7,7 @@ import java.util.List;
 import uga.cs4370.mydb.Relation;
 import uga.cs4370.mydb.RelationImpl;
 import uga.cs4370.mydb.Type;
+import uga.cs4370.mydb.PredicateImpl.ComparisonOperator;
 
 public class Tester {
 
@@ -36,8 +37,40 @@ public class Tester {
         System.out.println("gender is at index " + rel.getAttrIndex("gender"));
         System.out.println("dept is at index " + rel.getAttrIndex("dept"));
 
-        System.out.println("relation is of size " + rel.getSize());
+        System.out.println("\nrelation is of size " + rel.getSize());
 
+        // Testing RA /////////////////
+
+        // Select
+
+        RA ra = new RAImpl();
+
+        System.out.println("\ngender = f: ");
+        Predicate predGenderF = new PredicateImpl(2, "f", ComparisonOperator.EQUALS);
+        Relation onlyGenderF = ra.select(rel, predGenderF);
+        onlyGenderF.print();
+
+        // Project
+
+        System.out.println("Project id, name, and dept: ");
+        Relation onlyIdNameDept = ra.project(rel, Arrays.asList("id", "name", "dept"));
+        onlyIdNameDept.print();
+
+        // Union
+
+
+        System.out.println("Union: ");
+        Relation relNew = rb.newRelation("relation2", Arrays.asList("id", "name", "gender", "dept"), Arrays.asList(Type.INTEGER, Type.STRING, Type.STRING, Type.STRING));
+        relNew.insert(Arrays.asList(new Cell(3), new Cell("Ravaan"), new Cell("m"), new Cell("Mechanical") ));
+        Relation relUnion = ra.union(rel, relNew);
+        relNew.print();
+        relUnion.print();
+
+        // Rename
+
+        System.out.println("Rename dept to department: ");
+        Relation relRename = ra.rename(rel, rel.getAttrs(),  Arrays.asList("id", "name", "gender", "department"));
+        relRename.print();
 
     }
     
