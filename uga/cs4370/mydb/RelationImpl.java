@@ -42,7 +42,28 @@ public class RelationImpl implements Relation {
      * modifications to the rows by the callers of this method.
      */
     public List<List<Cell>> getRows(){
-        return rows;
+        List<List<Cell>> rowsCopy = new ArrayList<List<Cell>>();
+
+        for (List<Cell> row : rows) {
+
+            List<Cell> newRow = new ArrayList<Cell>();
+            for (Cell cell : row) {
+                switch (cell.getType()) {
+                    case INTEGER:
+                        newRow.add(new Cell(cell.getAsInt()));
+                        break;
+                    case DOUBLE:
+                        newRow.add(new Cell(cell.getAsDouble()));
+                        break;
+                    case STRING:
+                        newRow.add(new Cell(cell.getAsString()));
+                        break;
+                }
+            }
+            rowsCopy.add(newRow);
+
+        }
+        return rowsCopy;
     }
 
     /**
