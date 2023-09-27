@@ -287,40 +287,32 @@ public class RAImpl implements RA {
      * 
      * @return The resulting relation after applying theta join.
      */
-
     public Relation join(Relation rel1, Relation rel2, Predicate p) {
         // Check for compatible attributes
-        // Assume that the common attributes are determined based on the predicate p
-
-        List<String> newAttrs = new ArrayList<>();
-        List<Type> newTypes = new ArrayList<>();
-
-        // Add attributes from rel1 to new attribute list
-        for (String attr : rel1.getAttrs()) {
-            newAttrs.add(rel1.getName() + attr);
-            newTypes.add(rel1.getTypes().get(rel1.getAttrs().indexOf(attr)));
-        }
-
-        // Add attributes from rel2 to new attribute list
-        for (String attr : rel2.getAttrs()) {
-            newAttrs.add(rel2.getName() + attr);
-            newTypes.add(rel2.getTypes().get(rel2.getAttrs().indexOf(attr)));
-        }
-
-        Relation newRel = rb.newRelation(rel1.getName() + "Join" + rel2.getName(), newAttrs, newTypes);
-
-        // For each combination of rows from rel1 and rel2, apply the predicate
+        List<String> joinAttrs = new ArrayList<>(rel1.getAttrs());
+        joinAttrs.addAll(rel2.getAttrs());
+        
+        List<Type> joinTypes = new ArrayList<>(rel1.getTypes());
+        joinTypes.addAll(rel2.getTypes());
+        
+        List<List<Cell>> joinRows = new ArrayList<>();
+        
         for (List<Cell> row1 : rel1.getRows()) {
             for (List<Cell> row2 : rel2.getRows()) {
                 List<Cell> combinedRow = new ArrayList<>(row1);
                 combinedRow.addAll(row2);
-
+                // Check if the combined row satisfies the predicate
                 if (p.check(combinedRow)) {
-                    newRel.insert(combinedRow);
+                    joinRows.add(combinedRow);
                 }
             }
         }
-
-        return newRel;
+        
+        Relation joinResult = rb.newRelation("Theta Join Result", joinAttrs, joinTypes);
+        for (List<Cell> joinRow : joinRows) {
+            joinResult.insert(joinRow);
+        }     
+        return joinResult;
     }
 }
+

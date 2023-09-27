@@ -154,27 +154,59 @@ public class Tester {
 
         teachesRel.print();
 
+        System.out.println("Join: ");
         // Create two relations
-    RelationBuilder rb10 = new RelationBuilderImpl();
-    Relation rel1 = rb10.newRelation("Students", Arrays.asList("id", "name", "age"), Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
-    Relation rel2 = rb10.newRelation("Courses", Arrays.asList("id", "courseName"), Arrays.asList(Type.INTEGER, Type.STRING));
+        RelationBuilder rb10 = new RelationBuilderImpl();
+        Relation rel1 = rb10.newRelation("Students", Arrays.asList("id", "name", "age"), Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
+        Relation rel2 = rb10.newRelation("Courses", Arrays.asList("id", "courseName"), Arrays.asList(Type.INTEGER, Type.STRING));
 
-    // Insert some data into rel1 and rel2 with a common attribute
-    List<Cell> row1a = Arrays.asList(new Cell(1), new Cell("Alice"), new Cell(20));
-    List<Cell> row1b = Arrays.asList(new Cell(2), new Cell("Bob"), new Cell(21));
-    List<Cell> row2a = Arrays.asList(new Cell(1), new Cell("Math"));
-    List<Cell> row2b = Arrays.asList(new Cell(2), new Cell("History"));
+        // Insert some data into rel1 and rel2 with a common attribute
+        List<Cell> row1a = Arrays.asList(new Cell(1), new Cell("Alice"), new Cell(20));
+        List<Cell> row1b = Arrays.asList(new Cell(2), new Cell("Bob"), new Cell(21));
+        List<Cell> row2a = Arrays.asList(new Cell(1), new Cell("Math"));
+        List<Cell> row2b = Arrays.asList(new Cell(2), new Cell("History"));
 
-    rel1.insert(row1a);
-    rel1.insert(row1b);
-    rel2.insert(row2a);
-    rel2.insert(row2b);
+        rel1.insert(row1a);
+        rel1.insert(row1b);
+        rel2.insert(row2a);
+        rel2.insert(row2b);
 
-    // Perform a natural join and print the result
-    RAImpl rab = new RAImpl();
-    Relation naturalJoined = rab.join(rel1, rel2);
-    naturalJoined.print();
+        // Perform a natural join and print the result
+        RAImpl rab = new RAImpl();
+        Relation naturalJoined = rab.join(rel1, rel2);
+        naturalJoined.print();
 
-    }
+        // Theta Join
+
+        System.out.println("Theta Join: ");
+
+        // Create two relations for testing theta join
+        RelationBuilder rbTheta = new RelationBuilderImpl();
+        Relation relTheta1 = rbTheta.newRelation("RelationTheta1", Arrays.asList("id", "name"), Arrays.asList(Type.INTEGER, Type.STRING));
+        Relation relTheta2 = rbTheta.newRelation("RelationTheta2", Arrays.asList("id", "age"), Arrays.asList(Type.INTEGER, Type.INTEGER));
+
+        // Insert some data into relTheta1 and relTheta2
+        List<Cell> relTheta1Row1 = Arrays.asList(new Cell(1), new Cell("Alice"));
+        List<Cell> relTheta1Row2 = Arrays.asList(new Cell(2), new Cell("Bob"));
+        relTheta1.insert(relTheta1Row1);
+        relTheta1.insert(relTheta1Row2);
+
+        List<Cell> relTheta2Row1 = Arrays.asList(new Cell(1), new Cell(20));
+        List<Cell> relTheta2Row2 = Arrays.asList(new Cell(2), new Cell(25));
+        relTheta2.insert(relTheta2Row1);
+        relTheta2.insert(relTheta2Row2);
+
+        // Define the predicate for the theta join
+        Predicate thetaPredicate = (List<Cell> cellRow) -> {
+            int id1 = cellRow.get(0).getAsInt();  
+            int id2 = cellRow.get(2).getAsInt();  
+            return id1 == id2;
+        };
+
+        // Perform the theta join
+        System.out.println("Theta Join Result:");
+        Relation thetaJoinResult = ra.join(relTheta1, relTheta2, thetaPredicate);
+        thetaJoinResult.print();
     
+    }
 }
