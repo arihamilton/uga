@@ -230,63 +230,57 @@ public class RAImpl implements RA {
      * @return The resulting relation after applying natural join.
      */
     
-    public Relation join(Relation rel1, Relation rel2) {
+     public Relation join(Relation rel1, Relation rel2) {
         // Check for compatible attributes
-        List<String> commonAttrs = new ArrayList<>(rel1.getAttrs());
-        commonAttrs.retainAll(rel2.getAttrs());
-
-        // If there are no common attributes, throw an exception
+        List<String> commonAttrs = new ArrayList<>();
+        for (String attribute : rel1.getAttrs()) {
+            if (rel2.hasAttr(attribute)) {
+                commonAttrs.add(attribute);
+            }
+        }
+    
+        // If there are no common attributes, return an empty relation
         if (commonAttrs.isEmpty()) {
-            throw new IllegalArgumentException("The relations have no common attributes for natural join.");
+            System.out.println("it didn't work");
+            return rb.newRelation("Join Result", new ArrayList<>(), new ArrayList<>());
         }
-
-        List<String> newAttrs = new ArrayList<>();
-        List<Type> newTypes = new ArrayList<>();
-
-        // Add attributes from rel1 to new attribute list
-        for (String attr : rel1.getAttrs()) {
-            if (!commonAttrs.contains(attr)) {
-                newAttrs.add(rel1.getName() + attr);
-                newTypes.add(rel1.getTypes().get(rel1.getAttrs().indexOf(attr)));
-            }
-        }
-
-        // Add attributes from rel2 to new attribute list
-        for (String attr : rel2.getAttrs()) {
-            if (!commonAttrs.contains(attr)) {
-                newAttrs.add(rel2.getName() + attr);
-                newTypes.add(rel2.getTypes().get(rel2.getAttrs().indexOf(attr)));
-            }
-        }
-
-        Relation newRel = rb.newRelation(rel1.getName() + "Join" + rel2.getName(), newAttrs, newTypes);
-
-        // For each row in rel1, join with rows from rel2 based on common attributes
+    
+        // New RelationImpl to store the result
+        List<String> joinAttrs = new ArrayList<>(rel1.getAttrs());
+        joinAttrs.addAll(rel2.getAttrs());
+    
+        List<Type> joinTypes = new ArrayList<>(rel1.getTypes());
+        joinTypes.addAll(rel2.getTypes());
+    
+        List<List<Cell>> joinRows = new ArrayList<>();
+    
         for (List<Cell> row1 : rel1.getRows()) {
             for (List<Cell> row2 : rel2.getRows()) {
-                boolean canJoin = true;
-                for (String attr : commonAttrs) {
-                    int index1 = rel1.getAttrs().indexOf(attr);
-                    int index2 = rel2.getAttrs().indexOf(attr);
+                boolean allAttributesMatch = true;
+                for (String commonAttribute : commonAttrs) {
+                    int index1 = rel1.getAttrs().indexOf(commonAttribute);
+                    int index2 = rel2.getAttrs().indexOf(commonAttribute);
                     if (!row1.get(index1).equals(row2.get(index2))) {
-                        canJoin = false;
+                        allAttributesMatch = false;
                         break;
                     }
                 }
-                if (canJoin) {
-                    List<Cell> newRow = new ArrayList<>(row1);
-                    for (int i = 0; i < row2.size(); i++) {
-                        if (!commonAttrs.contains(rel2.getAttrs().get(i))) {
-                            newRow.add(row2.get(i));
-                        }
-                    }
-                    newRel.insert(newRow);
+    
+                if (allAttributesMatch) {
+                    List<Cell> joinRow = new ArrayList<>(row1);
+                    joinRow.addAll(row2);
+                    joinRows.add(joinRow);
                 }
             }
         }
-
-        return newRel;
+        Relation joinResult = rb.newRelation("Join Result", joinAttrs, joinTypes);
+        for (List<Cell> joinRow : joinRows) {
+            joinResult.insert(joinRow);
+        }     
+        return joinResult;
     }
+    
+            
 
     /**
      * Performs theta join on relations rel1 and rel2 with predicate p.

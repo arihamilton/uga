@@ -154,7 +154,26 @@ public class Tester {
 
         teachesRel.print();
 
-        
+        // Create two relations
+    RelationBuilder rb10 = new RelationBuilderImpl();
+    Relation rel1 = rb10.newRelation("Students", Arrays.asList("id", "name", "age"), Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
+    Relation rel2 = rb10.newRelation("Courses", Arrays.asList("id", "courseName"), Arrays.asList(Type.INTEGER, Type.STRING));
+
+    // Insert some data into rel1 and rel2 with a common attribute
+    List<Cell> row1a = Arrays.asList(new Cell(1), new Cell("Alice"), new Cell(20));
+    List<Cell> row1b = Arrays.asList(new Cell(2), new Cell("Bob"), new Cell(21));
+    List<Cell> row2a = Arrays.asList(new Cell(1), new Cell("Math"));
+    List<Cell> row2b = Arrays.asList(new Cell(2), new Cell("History"));
+
+    rel1.insert(row1a);
+    rel1.insert(row1b);
+    rel2.insert(row2a);
+    rel2.insert(row2b);
+
+    // Perform a natural join and print the result
+    RAImpl rab = new RAImpl();
+    Relation naturalJoined = rab.join(rel1, rel2);
+    naturalJoined.print();
 
     }
     
