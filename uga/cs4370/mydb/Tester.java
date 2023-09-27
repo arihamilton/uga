@@ -96,7 +96,7 @@ public class Tester {
         Relation relCarP = ra.cartesianProduct(relInstructor, relTeaches);
         System.out.println(relCarP.getName());
         relCarP.print();
-        
+  
         ///////////////////////////
         
 
@@ -154,8 +154,37 @@ public class Tester {
 
         teachesRel.print();
 
-        
+         // Create two relations
+        Relation rel1 = rb.newRelation("Students", Arrays.asList("id", "name", "age"), Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
+        Relation rel2 = rb.newRelation("Courses", Arrays.asList("id", "courseName"), Arrays.asList(Type.INTEGER, Type.STRING));
 
+        // Insert some data into rel1 and rel2 with a common attribute
+        List<Cell> row1a = Arrays.asList(new Cell(1), new Cell("Alice"), new Cell(20));
+        List<Cell> row1b = Arrays.asList(new Cell(2), new Cell("Bob"), new Cell(21));
+        List<Cell> row2a = Arrays.asList(new Cell(1), new Cell("Math"));
+        List<Cell> row2b = Arrays.asList(new Cell(2), new Cell("History"));
+
+        rel1.insert(row1a);
+        rel1.insert(row1b);
+        rel2.insert(row2a);
+        rel2.insert(row2b);
+
+        // Print the original relations
+
+        System.out.println("Testing Join:");
+
+        System.out.println("Original Relation 1:");
+        rel1.print();
+
+        System.out.println("\nOriginal Relation 2:");
+        rel2.print();
+
+        // Perform a natural join and print the result
+        RAImpl rab = new RAImpl();
+        Relation naturalJoined = rab.join(rel1, rel2);
+
+        // Print the resulting joined relation
+        System.out.println("\nNatural Joined Relation:");
+        naturalJoined.print();
     }
-    
 }
