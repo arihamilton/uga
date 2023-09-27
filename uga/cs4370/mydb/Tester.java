@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.lang.model.util.Types;
+
 import uga.cs4370.mydb.Relation;
 import uga.cs4370.mydb.RelationImpl;
 import uga.cs4370.mydb.Type;
@@ -232,13 +234,86 @@ public class Tester {
         enrollmentRow3.add(new Cell("C")); 
         enrollmentRel.insert(enrollmentRow3);
 
+        /*
+         * Courses Table
+         */
+        RelationBuilder courses = new RelationBuilderImpl();
+        Relation coursesRel = courses.newRelation("Enrollment", Arrays.asList("CourseID", "CName", "Credits"), Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
+
+        List<Cell> coursesRow = new ArrayList<Cell>();
+        coursesRow.add(new Cell(1000)); 
+        coursesRow.add(new Cell("Programming Principles"));
+        coursesRow.add(new Cell(4));
+        coursesRel.insert(coursesRow);
+
+        List<Cell> coursesRow2 = new ArrayList<Cell>();
+        coursesRow2.add(new Cell(2000)); 
+        coursesRow2.add(new Cell("Intermediate Programming"));
+        coursesRow2.add(new Cell(4));
+        coursesRel.insert(coursesRow2);
+
+        List<Cell> coursesRow3 = new ArrayList<Cell>();
+        coursesRow3.add(new Cell(3000)); 
+        coursesRow3.add(new Cell("Data Structures"));
+        coursesRow3.add(new Cell(4));
+        coursesRel.insert(coursesRow3);
+
+        List<Cell> coursesRow4 = new ArrayList<Cell>();
+        coursesRow4.add(new Cell(4000)); 
+        coursesRow4.add(new Cell("Algorithms"));
+        coursesRow4.add(new Cell(4));
+        coursesRel.insert(coursesRow4);
+
+        RelationBuilder students = new RelationBuilderImpl();
+        Relation studentsRel = students.newRelation("Students", Arrays.asList("StudentID", "FName", "LName", "DoB", "Major"), Arrays.asList(Type.INTEGER, Type.STRING, Type.STRING, Type.STRING, Type.STRING));
+
+        List<Cell> studentsRow = new ArrayList<Cell>();
+        studentsRow.add(new Cell(1234)); 
+        studentsRow.add(new Cell("Lebron"));
+        studentsRow.add(new Cell("James"));
+        studentsRow.add(new Cell("2000-03-22"));
+        studentsRow.add(new Cell("Computer Science"));
+        studentsRel.insert(studentsRow);
+
+        List<Cell> studentsRow2 = new ArrayList<Cell>();
+        studentsRow2.add(new Cell(1235)); 
+        studentsRow2.add(new Cell("Michael"));
+        studentsRow2.add(new Cell("Jordan"));
+        studentsRow2.add(new Cell("1998-06-15"));
+        studentsRow2.add(new Cell("Computer Science"));
+        studentsRel.insert(studentsRow2);
+
+        List<Cell> studentsRow3 = new ArrayList<Cell>();
+        studentsRow3.add(new Cell(1236)); 
+        studentsRow3.add(new Cell("Chris"));
+        studentsRow3.add(new Cell("Paul"));
+        studentsRow3.add(new Cell("1999-01-29"));
+        studentsRow3.add(new Cell("Finance"));
+        studentsRel.insert(studentsRow3);
+
+        /*
+         * Query for question one
+         */
         RAImpl queryOne = new RAImpl();
         Predicate queryOnePredicate = new PredicateImpl(1, 1234, PredicateImpl.ComparisonOperator.EQUALS);
     
         Relation queryOneResult = queryOne.select(enrollmentRel, queryOnePredicate);
-        List<String> attributesToProject = Arrays.asList("CourseID");
-        Relation queryOneFinalResult = queryOne.project(queryOneResult, attributesToProject);   
+        List<String> queryOneAttributes = Arrays.asList("CourseID");
+        Relation queryOneFinalResult = queryOne.project(queryOneResult, queryOneAttributes);   
         queryOneFinalResult.print();
+
+        /*
+         * Query for question two
+         */
+        Predicate queryTwoPredicate = new PredicateImpl(4, "Computer Science", PredicateImpl.ComparisonOperator.EQUALS);    
+        Relation queryTwoResult = queryOne.select(studentsRel, queryTwoPredicate);
+        List<String> queryTwoAttributes = Arrays.asList("StudentID", "FName", "LName");
+        Relation queryTwoFinalResult = queryOne.project(queryTwoResult, queryTwoAttributes);
+        queryTwoFinalResult.print();
+
+        /*
+         * Query for question three
+         */
     
     }
 }
