@@ -210,7 +210,7 @@ public class Tester {
         relCourses.print();
 
         // Verify the predicate
-        PredicateImpl predicateForThetaJoin = new PredicateImpl(0, 0, PredicateImpl.ComparisonOperator.EQUALS);
+        PredicateImpl predicateForThetaJoin = new PredicateImpl(0, 1, PredicateImpl.ComparisonOperator.EQUALS);
 
         // Perform a theta join using RAImpl and print the result
         RAImpl raThetaJoin = new RAImpl();
