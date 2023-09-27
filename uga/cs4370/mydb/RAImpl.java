@@ -274,6 +274,7 @@ public class RAImpl implements RA {
             }
         }
         Relation joinResult = rb.newRelation("Join Result", joinAttrs, joinTypes);
+        
         for (List<Cell> joinRow : joinRows) {
             joinResult.insert(joinRow);
         }     
@@ -288,31 +289,44 @@ public class RAImpl implements RA {
      * @return The resulting relation after applying theta join.
      */
     public Relation join(Relation rel1, Relation rel2, Predicate p) {
-        // Check for compatible attributes
+        List<String> commonAttrs = new ArrayList<>();
+
+        for (String attribute : rel1.getAttrs()) {
+            if (rel2.hasAttr(attribute)) {
+                commonAttrs.add(attribute);
+            }
+        }
+
+        // If there are no common attributes, return an empty relation
+        if (commonAttrs.isEmpty()) {
+            return rb.newRelation("Join Result", new ArrayList<>(), new ArrayList<>());
+        }
+
         List<String> joinAttrs = new ArrayList<>(rel1.getAttrs());
         joinAttrs.addAll(rel2.getAttrs());
-        
+
         List<Type> joinTypes = new ArrayList<>(rel1.getTypes());
         joinTypes.addAll(rel2.getTypes());
-        
+
         List<List<Cell>> joinRows = new ArrayList<>();
-        
+
         for (List<Cell> row1 : rel1.getRows()) {
             for (List<Cell> row2 : rel2.getRows()) {
-                List<Cell> combinedRow = new ArrayList<>(row1);
-                combinedRow.addAll(row2);
-                // Check if the combined row satisfies the predicate
-                if (p.check(combinedRow)) {
-                    joinRows.add(combinedRow);
+                if (p.check(row1) && p.check(row2)) {
+                    List<Cell> joinRow = new ArrayList<>(row1);
+                    joinRow.addAll(row2);
+                    joinRows.add(joinRow);
                 }
             }
         }
+
+        Relation joinResult = rb.newRelation("Join Result", joinAttrs, joinTypes);
+        System.out.println("joinRows: " + joinRows);
         
-        Relation joinResult = rb.newRelation("Theta Join Result", joinAttrs, joinTypes);
         for (List<Cell> joinRow : joinRows) {
             joinResult.insert(joinRow);
-        }     
+        }
+
         return joinResult;
     }
 }
-

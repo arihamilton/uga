@@ -180,65 +180,39 @@ public class Tester {
 
         System.out.println("Theta Join: ");
 
-        // Create two relations for testing theta join
-        RelationBuilder rbTheta = new RelationBuilderImpl();
-        Relation relTheta1 = rbTheta.newRelation("RelationTheta1", Arrays.asList("id", "name"), Arrays.asList(Type.INTEGER, Type.STRING));
-        Relation relTheta2 = rbTheta.newRelation("RelationTheta2", Arrays.asList("id", "age"), Arrays.asList(Type.INTEGER, Type.INTEGER));
+        // Create two relations
+        RelationBuilder rbStudents = new RelationBuilderImpl();
+        Relation relStudents = rbStudents.newRelation("Students", Arrays.asList("id", "name", "age"), Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
 
-        // Insert some data into relTheta1 and relTheta2
-        List<Cell> relTheta1Row1 = Arrays.asList(new Cell(1), new Cell("Alice"));
-        List<Cell> relTheta1Row2 = Arrays.asList(new Cell(2), new Cell("Bob"));
-        relTheta1.insert(relTheta1Row1);
-        relTheta1.insert(relTheta1Row2);
+        RelationBuilder rbCourses = new RelationBuilderImpl();
+        Relation relCourses = rbCourses.newRelation("Courses", Arrays.asList("id", "courseName"), Arrays.asList(Type.INTEGER, Type.STRING));
 
-        List<Cell> relTheta2Row1 = Arrays.asList(new Cell(1), new Cell(20));
-        List<Cell> relTheta2Row2 = Arrays.asList(new Cell(2), new Cell(25));
-        relTheta2.insert(relTheta2Row1);
-        relTheta2.insert(relTheta2Row2);
-
-        // Define the predicate for the theta join
-        Predicate thetaPredicate = (List<Cell> cellRow) -> {
-            int id1 = cellRow.get(0).getAsInt();  
-            int id2 = cellRow.get(2).getAsInt();  
-            return id1 == id2;
-        };
-
-        // Perform the theta join
-        System.out.println("Theta Join Result:");
-        Relation thetaJoinResult = ra.join(relTheta1, relTheta2, thetaPredicate);
-        thetaJoinResult.print();
-
-        RelationBuilder enrollment = new RelationBuilderImpl();
-        Relation enrollmentRel = enrollment.newRelation("Enrollment", Arrays.asList("EnrollmentID", "StudentID", "CourseID", "Grade"), Arrays.asList(Type.INTEGER, Type.INTEGER, Type.INTEGER, Type.STRING));
+        // Insert some data into relStudents and relCourses with a common attribute
+        List<Cell> studentsRow1 = Arrays.asList(new Cell(1), new Cell("Alice"), new Cell(20));
+        List<Cell> studentsRow2 = Arrays.asList(new Cell(3), new Cell("Bob"), new Cell(21)); 
+        List<Cell> coursesRow1 = Arrays.asList(new Cell(1), new Cell("Math"));
+        List<Cell> coursesRow2 = Arrays.asList(new Cell(2), new Cell("History")); 
+        List<Cell> coursesRow3 = Arrays.asList(new Cell(3), new Cell("Science")); 
         
-        List<Cell> enrollmentRow = new ArrayList<Cell>();
-        enrollmentRow.add(new Cell(1)); 
-        enrollmentRow.add(new Cell(1234));
-        enrollmentRow.add(new Cell(1000));
-        enrollmentRow.add(new Cell("A")); 
-        enrollmentRel.insert(enrollmentRow);
-    
-        List<Cell> enrollmentRow2 = new ArrayList<Cell>();
-        enrollmentRow2.add(new Cell(2)); 
-        enrollmentRow2.add(new Cell(1234));
-        enrollmentRow2.add(new Cell(3000));
-        enrollmentRow2.add(new Cell("F")); 
-        enrollmentRel.insert(enrollmentRow2);
-    
-        List<Cell> enrollmentRow3 = new ArrayList<Cell>();
-        enrollmentRow3.add(new Cell(3)); 
-        enrollmentRow3.add(new Cell(1235));
-        enrollmentRow3.add(new Cell(1000));
-        enrollmentRow3.add(new Cell("C")); 
-        enrollmentRel.insert(enrollmentRow3);
+        relStudents.insert(studentsRow1);
+        relStudents.insert(studentsRow2);
+        relCourses.insert(coursesRow1);
+        relCourses.insert(coursesRow2);
+        relCourses.insert(coursesRow3);
 
-        RAImpl queryOne = new RAImpl();
-        Predicate queryOnePredicate = new PredicateImpl(1, 1234, PredicateImpl.ComparisonOperator.EQUALS);
-    
-        Relation queryOneResult = queryOne.select(enrollmentRel, queryOnePredicate);
-        List<String> attributesToProject = Arrays.asList("CourseID");
-        Relation queryOneFinalResult = queryOne.project(queryOneResult, attributesToProject);   
-        queryOneFinalResult.print();
-    
+        // Print data in relStudents and relCourses
+        System.out.println("Data in relStudents:");
+        relStudents.print();
+
+        System.out.println("Data in relCourses:");
+        relCourses.print();
+
+        // Verify the predicate
+        PredicateImpl predicateForThetaJoin = new PredicateImpl(0, 0, PredicateImpl.ComparisonOperator.EQUALS);
+
+        // Perform a theta join using RAImpl and print the result
+        RAImpl raThetaJoin = new RAImpl();
+        Relation thetaJoined = raThetaJoin.join(relStudents, relCourses, predicateForThetaJoin);
+        thetaJoined.print();
     }
 }
