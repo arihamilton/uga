@@ -216,6 +216,32 @@ public class Tester {
         RAImpl raThetaJoin = new RAImpl();
         Relation thetaJoined = raThetaJoin.join(relStudents, relCourses, predicateForThetaJoin);
         thetaJoined.print();
+
+        
+        RelationBuilder enrollment = new RelationBuilderImpl();
+        Relation enrollmentRel = enrollment.newRelation("Enrollment", Arrays.asList("EnrollmentID", "StudentID", "CourseID", "Grade"), Arrays.asList(Type.INTEGER, Type.INTEGER, Type.INTEGER, Type.STRING));
+        
+        List<Cell> enrollmentRow = new ArrayList<Cell>();
+        enrollmentRow.add(new Cell(1)); 
+        enrollmentRow.add(new Cell(1234));
+        enrollmentRow.add(new Cell(1000));
+        enrollmentRow.add(new Cell("A")); 
+        enrollmentRel.insert(enrollmentRow);
+    
+        List<Cell> enrollmentRow2 = new ArrayList<Cell>();
+        enrollmentRow2.add(new Cell(2)); 
+        enrollmentRow2.add(new Cell(1234));
+        enrollmentRow2.add(new Cell(3000));
+        enrollmentRow2.add(new Cell("F")); 
+        enrollmentRel.insert(enrollmentRow2);
+    
+        List<Cell> enrollmentRow3 = new ArrayList<Cell>();
+        enrollmentRow3.add(new Cell(3)); 
+        enrollmentRow3.add(new Cell(1235));
+        enrollmentRow3.add(new Cell(1000));
+        enrollmentRow3.add(new Cell("C")); 
+        enrollmentRel.insert(enrollmentRow3);
+    
         /*
          * Courses Table
          */
