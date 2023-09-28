@@ -308,6 +308,7 @@ public class Tester {
         Relation queryOneResult = queryOne.select(enrollmentRel, queryOnePredicate);
         List<String> queryOneAttributes = Arrays.asList("CourseID");
         Relation queryOneFinalResult = queryOne.project(queryOneResult, queryOneAttributes);   
+        System.out.println("Query 1: ");
         queryOneFinalResult.print();
 
         /*
@@ -317,6 +318,7 @@ public class Tester {
         Relation queryTwoResult = queryOne.select(studentsRel, queryTwoPredicate);
         List<String> queryTwoAttributes = Arrays.asList("StudentID", "FName", "LName");
         Relation queryTwoFinalResult = queryOne.project(queryTwoResult, queryTwoAttributes);
+        System.out.println("Query 2: ");
         queryTwoFinalResult.print();
 
         /*
@@ -330,6 +332,7 @@ public class Tester {
         List<String> attrsToInclude = Arrays.asList("CName");
         Relation filteredResult = ra.project(filterForStudent, attrsToInclude);
 
+        System.out.println("Query 3: ");
         filteredResult.print();
 
         /*
@@ -344,11 +347,28 @@ public class Tester {
 
         List<String> projectAttrs = Arrays.asList("ProfessorID", "FName", "LName");
         Relation queryFourResult = ra.project(queryFourJoin, projectAttrs);
+        System.out.println("Query 4: ");
         queryFourResult.print();
 
         /*
          * Query for question five
          */
+
+        // Project Student ID on Enrollment (Get student ids of students who are enrolled)
+        System.out.println("Query 5: ");
+        Relation enrollStudentIDrel = ra.project(enrollmentRel, Arrays.asList("StudentID"));
+
+        // Project StudentID, FName, LName on Students (Get all student names and ids)
+        Relation studentsNameRel = ra.project(studentsRel, Arrays.asList("StudentID", "FName", "LName"));
+
+        // Workaround for natural join (Get students names and ids of students who are enrolled using join)
+        Relation studentsEnrolledRel = ra.join(enrollStudentIDrel, studentsNameRel);
+        studentsEnrolledRel = ra.rename(studentsEnrolledRel, studentsEnrolledRel.getAttrs(), Arrays.asList("StudentID0", "StudentID", "FName", "LName"));
+        studentsEnrolledRel = ra.project(studentsEnrolledRel, Arrays.asList("StudentID", "FName", "LName"));
+
+        // Get students that are not enrolled in any courses ( get Students in studentsNameRel but not studentsEnrolledRel)
+        Relation studentsUnenrolledRel = ra.diff(studentsNameRel, studentsEnrolledRel);
+        studentsUnenrolledRel.print();
 
 
          /*
@@ -361,6 +381,7 @@ public class Tester {
           Relation projectedJoin = ra.project(courseAndTeaches, attrsToInclude2);
 
           Relation difference = ra.diff(projectedCourses, projectedJoin);
+          System.out.println("Query 6: ");
           difference.print();
 
         
@@ -379,6 +400,8 @@ public class Tester {
         List<String> attrsToIncludeFiltered = Arrays.asList("FName", "LName", "StudentID");
         Relation projectedResult = ra.project(gradeAndMajor, attrsToIncludeFiltered);
 
+        System.out.println("Query 7: ");
+
         if (projectedResult != null) {
             projectedResult.print(); 
         } else {
@@ -396,7 +419,6 @@ public class Tester {
         // Project StudentID, FName, LName, ProfessorID and Rename Attributes
 		Relation enrollmentPTJoin2 = ra.project(enrollmentPTJoin, Arrays.asList("StudentID", "FName", "LName", "ProfessorID"));
         Relation enrollmentPTJoin3 = ra.rename(enrollmentPTJoin2, enrollmentPTJoin2.getAttrs(), Arrays.asList("StudentID", "ProfessorFName", "ProfessorLName", "ProfessorID"));
-		enrollmentPTJoin3.print();
 
 		// Students join on Students.StudentId = AboveProjection.StudentID
        
@@ -408,9 +430,59 @@ public class Tester {
 
 		// Project FName, LName, ProfessorID
 		Relation queryEightResult = ra.project(onlyCSRel, Arrays.asList("ProfessorFName", "ProfessorLName", "ProfessorID"));
-        System.out.println("Query eight: ");
+        System.out.println("Query 8: ");
 		queryEightResult.print();
-        
+
+
+        System.out.println("\n--------------------------------------------\n");
+
+         /**
+         * Meaningful Query Implementation
+         */
+
+
+        // SELECT students named "Lebron"
+        PredicateImpl selectLebronPredicate = new PredicateImpl(1, "Lebron", PredicateImpl.ComparisonOperator.EQUALS);
+        Relation selectedLebronStudents = ra.select(studentsRel, selectLebronPredicate);
+        System.out.println("Selected Students named Lebron:");
+        selectedLebronStudents.print();
+
+        // PROJECT to show only student IDs and names
+        List<String> projectionAttrs = Arrays.asList("StudentID", "FName");
+        Relation projectedStudents = ra.project(studentsRel, projectionAttrs);
+        System.out.println("Projected Students (StudentID, FName):");
+        projectedStudents.print();
+
+        // UNION of coursesRel and coursesRel2 (assuming coursesRel2 exists)
+        RelationBuilder courses2 = new RelationBuilderImpl();
+        Relation coursesRel2 = courses2.newRelation("Courses2", Arrays.asList("CourseID", "CName", "Credits"), Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
+        List<Cell> coursesRow5 = new ArrayList<>();
+        coursesRow5.add(new Cell(5000));
+        coursesRow5.add(new Cell("AdvancedAlgorithms"));
+        coursesRow5.add(new Cell(4));
+        coursesRel2.insert(coursesRow5);
+
+        Relation unionCourses = ra.union(coursesRel, coursesRel2);
+        System.out.println("Union of Courses:");
+        unionCourses.print();
+
+        // DIFFERENCE of coursesRel and coursesRel2
+        Relation diffCourses = ra.diff(coursesRel, coursesRel2);
+        System.out.println("Difference of Courses:");
+        diffCourses.print();
+
+        // RENAME attributes of studentsRel
+        List<String> origAttr = Arrays.asList("StudentID", "FName", "LName", "DoB", "Major");
+        List<String> renamedAttr = Arrays.asList("StudentID", "FirstName", "LastName", "DateOfBirth", "Major");
+        Relation renamedStudents = ra.rename(studentsRel, origAttr, renamedAttr);
+        System.out.println("Renamed Students Relation:");
+        renamedStudents.print();
+
+        // CARTESIAN PRODUCT of studentsRel and coursesRel
+        Relation cartesianProductResult = ra.cartesianProduct(studentsRel, coursesRel);
+        System.out.println("Cartesian Product of Students and Courses:");
+        cartesianProductResult.print();
+
     }
 }
 
