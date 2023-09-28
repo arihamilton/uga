@@ -69,7 +69,7 @@ public class RAImpl implements RA {
                     }
                 }
             }
-            newRel.insert(newRow);
+            if (!(newRel.getRows().contains(newRow))) newRel.insert(newRow);
         }
         return newRel;
     }

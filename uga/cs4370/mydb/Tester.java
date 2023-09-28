@@ -384,6 +384,33 @@ public class Tester {
         } else {
             System.out.println("Query returned no results.");
         }
+
+        /*
+         * Query for question eight
+         */
+        // Teaches join on Teaches.ProfessorID = Professors.ProfessorID(Professors) = professorsTeachesJoin
+		
+		// Enrollment join on Enrollment.CourseId = AboveJoin.CourseID
+		Relation enrollmentPTJoin = ra.join(enrollmentRel, professorsTeachesJoin);
+
+        // Project StudentID, FName, LName, ProfessorID and Rename Attributes
+		Relation enrollmentPTJoin2 = ra.project(enrollmentPTJoin, Arrays.asList("StudentID", "FName", "LName", "ProfessorID"));
+        Relation enrollmentPTJoin3 = ra.rename(enrollmentPTJoin2, enrollmentPTJoin2.getAttrs(), Arrays.asList("StudentID", "ProfessorFName", "ProfessorLName", "ProfessorID"));
+		enrollmentPTJoin3.print();
+
+		// Students join on Students.StudentId = AboveProjection.StudentID
+       
+        Relation studentsEPTJoin = ra.join(studentsRel, enrollmentPTJoin3);
+		
+		// Major = Computer Science
+        Predicate predMajorCS = new PredicateImpl(studentsEPTJoin.getAttrIndex("Major"), "Computer Science", PredicateImpl.ComparisonOperator.EQUALS);
+		Relation onlyCSRel = ra.select(studentsEPTJoin, predMajorCS);
+
+		// Project FName, LName, ProfessorID
+		Relation queryEightResult = ra.project(onlyCSRel, Arrays.asList("ProfessorFName", "ProfessorLName", "ProfessorID"));
+        System.out.println("Query eight: ");
+		queryEightResult.print();
+        
     }
 }
 
