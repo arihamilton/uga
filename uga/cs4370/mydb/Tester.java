@@ -384,6 +384,55 @@ public class Tester {
         } else {
             System.out.println("Query returned no results.");
         }
+
+
+
+        
+        /**
+         * Meaningful Query Implementation
+         */
+
+
+        // SELECT students named "Lebron"
+        PredicateImpl selectLebronPredicate = new PredicateImpl(1, "Lebron", PredicateImpl.ComparisonOperator.EQUALS);
+        Relation selectedLebronStudents = ra.select(studentsRel, selectLebronPredicate);
+        System.out.println("Selected Students named Lebron:");
+        selectedLebronStudents.print();
+
+        // PROJECT to show only student IDs and names
+        List<String> projectionAttrs = Arrays.asList("StudentID", "FName");
+        Relation projectedStudents = ra.project(studentsRel, projectionAttrs);
+        System.out.println("Projected Students (StudentID, FName):");
+        projectedStudents.print();
+
+        // UNION of coursesRel and coursesRel2 (assuming coursesRel2 exists)
+        RelationBuilder courses2 = new RelationBuilderImpl();
+        Relation coursesRel2 = courses2.newRelation("Courses2", Arrays.asList("CourseID", "CName", "Credits"), Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
+        List<Cell> coursesRow5 = new ArrayList<>();
+        coursesRow5.add(new Cell(5000));
+        coursesRow5.add(new Cell("AdvancedAlgorithms"));
+        coursesRow5.add(new Cell(4));
+        coursesRel2.insert(coursesRow5);
+
+        Relation unionCourses = ra.union(coursesRel, coursesRel2);
+        System.out.println("Union of Courses:");
+        unionCourses.print();
+
+        // DIFFERENCE of coursesRel and coursesRel2
+        Relation diffCourses = ra.diff(coursesRel, coursesRel2);
+        System.out.println("Difference of Courses:");
+        diffCourses.print();
+
+        // RENAME attributes of studentsRel
+        List<String> origAttr = Arrays.asList("StudentID", "FName", "LName", "DoB", "Major");
+        List<String> renamedAttr = Arrays.asList("StudentID", "FirstName", "LastName", "DateOfBirth", "Major");
+        Relation renamedStudents = ra.rename(studentsRel, origAttr, renamedAttr);
+        System.out.println("Renamed Students Relation:");
+        renamedStudents.print();
+
+        // CARTESIAN PRODUCT of studentsRel and coursesRel
+        Relation cartesianProductResult = ra.cartesianProduct(studentsRel, coursesRel);
+        System.out.println("Cartesian Product of Students and Courses:");
+        cartesianProductResult.print();
     }
 }
-
