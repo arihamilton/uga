@@ -246,7 +246,7 @@ public class Tester {
          * Courses Table
          */
         RelationBuilder courses = new RelationBuilderImpl();
-        Relation coursesRel = courses.newRelation("Enrollment", Arrays.asList("CourseID", "CName", "Credits"), Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
+        Relation coursesRel = courses.newRelation("Courses", Arrays.asList("CourseID", "CName", "Credits"), Arrays.asList(Type.INTEGER, Type.STRING, Type.INTEGER));
 
         List<Cell> coursesRow = new ArrayList<Cell>();
         coursesRow.add(new Cell(1000)); 
@@ -322,6 +322,14 @@ public class Tester {
         /*
          * Query for question three
          */
-    
+        RAImpl ras = new RAImpl();
+        Relation joinedTable = ras.join(enrollmentRel, coursesRel);
+        PredicateImpl predicate2 = new PredicateImpl(joinedTable.getAttrIndex("StudentID"), 1234, PredicateImpl.ComparisonOperator.EQUALS);
+        Relation filterForStudent = ras.select(joinedTable, predicate2);
+
+        List<String> attrsToInclude = Arrays.asList("CName");
+        Relation filteredResult = ra.project(filterForStudent, attrsToInclude);
+
+        filteredResult.print();
     }
 }

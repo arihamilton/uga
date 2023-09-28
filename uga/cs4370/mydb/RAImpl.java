@@ -37,31 +37,43 @@ public class RAImpl implements RA {
      * present in rel.
      */
     public Relation project(Relation rel, List<String> attrs) throws IllegalArgumentException { 
-        
-        List<Integer> indices = new ArrayList<Integer>();
-        List<Type> types = new ArrayList<Type>();
-        
-        for (int c = 0; c < attrs.size(); c++) {
-            if (rel.hasAttr(attrs.get(c))) {
-                indices.add(rel.getAttrIndex(attrs.get(c)));
-                types.add(rel.getTypes().get(c));
+        List<Integer> indices = new ArrayList<>();
+        List<Type> types = new ArrayList<>();
+    
+        for (String attr : attrs) {
+            if (rel.hasAttr(attr)) {
+                int attrIndex = rel.getAttrIndex(attr);
+                indices.add(attrIndex);
+                types.add(rel.getTypes().get(attrIndex));
+            } else {
+                throw new IllegalArgumentException("Relation does not contain input attributes");
             }
-            else throw new IllegalArgumentException("Relation does not contain input attributes");
         }
-
+    
         Relation newRel = rb.newRelation(rel.getName(), attrs, types);
-
-        // Add rows only containing projected attributes to new relation
+    
         for (List<Cell> row : rel.getRows()) {
-            List<Cell> newRow = new ArrayList<Cell>();
-            for (Integer index : indices) {
-                newRow.add(row.get(index));
+            List<Cell> newRow = new ArrayList<>();
+            for (int index : indices) {
+                Type targetType = types.get(indices.indexOf(index));
+                Cell cell = row.get(index);
+                if (cell.getType() == targetType) {
+                    newRow.add(cell);
+                } else {
+                    if (targetType == Type.STRING) {
+                        newRow.add(new Cell(cell.toString())); 
+                    } else if (targetType == Type.INTEGER) {
+                        throw new IllegalArgumentException("Unsupported data type conversion");
+                    } else {
+                        throw new IllegalArgumentException("Unsupported data type conversion");
+                    }
+                }
             }
             newRel.insert(newRow);
         }
-
         return newRel;
     }
+    
 
     /**
      * Performs the union operation on the relations rel1 and rel2.
