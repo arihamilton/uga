@@ -363,6 +363,27 @@ public class Tester {
           Relation difference = ra.diff(projectedCourses, projectedJoin);
           difference.print();
 
+        
+        /*
+         * Query for question seven
+         */
 
+        PredicateImpl predicateForMajor = new PredicateImpl(studentsRel.getAttrIndex("Major"), "Computer Science", PredicateImpl.ComparisonOperator.EQUALS);
+        PredicateImpl predicateForGrade = new PredicateImpl(enrollmentRel.getAttrIndex("Grade"), "F", PredicateImpl.ComparisonOperator.EQUALS);
+
+        Relation filteredStudents = ra.select(studentsRel, predicateForMajor);
+        Relation filteredEnrollments = ra.select(enrollmentRel, predicateForGrade);
+
+        Relation gradeAndMajor = ra.join(filteredStudents, filteredEnrollments);
+
+        List<String> attrsToIncludeFiltered = Arrays.asList("FName", "LName", "StudentID");
+        Relation projectedResult = ra.project(gradeAndMajor, attrsToIncludeFiltered);
+
+        if (projectedResult != null) {
+            projectedResult.print(); 
+        } else {
+            System.out.println("Query returned no results.");
+        }
     }
 }
+
