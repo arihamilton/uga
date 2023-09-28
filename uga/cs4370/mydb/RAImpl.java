@@ -296,49 +296,38 @@ public class RAImpl implements RA {
             
 
     /**
-     * Performs theta join on relations rel1 and rel2 with predicate p.
-     * 
-     * @return The resulting relation after applying theta join.
-     */
+    * Performs theta join on relations rel1 and rel2 with predicate p.
+    *
+    * @return The resulting relation after applying theta join.
+    */
     public Relation join(Relation rel1, Relation rel2, Predicate p) {
-        List<String> commonAttrs = new ArrayList<>();
+        List<String> cartesianAttrs = new ArrayList<>(rel1.getAttrs());
+        cartesianAttrs.addAll(rel2.getAttrs());
 
-        for (String attribute : rel1.getAttrs()) {
-            if (rel2.hasAttr(attribute)) {
-                commonAttrs.add(attribute);
-            }
-        }
+        List<Type> cartesianTypes = new ArrayList<>(rel1.getTypes());
+        cartesianTypes.addAll(rel2.getTypes());
 
-        // If there are no common attributes, return an empty relation
-        if (commonAttrs.isEmpty()) {
-            return rb.newRelation("Join Result", new ArrayList<>(), new ArrayList<>());
-        }
-
-        List<String> joinAttrs = new ArrayList<>(rel1.getAttrs());
-        joinAttrs.addAll(rel2.getAttrs());
-
-        List<Type> joinTypes = new ArrayList<>(rel1.getTypes());
-        joinTypes.addAll(rel2.getTypes());
-
-        List<List<Cell>> joinRows = new ArrayList<>();
+        List<List<Cell>> cartesianRows = new ArrayList<>();
 
         for (List<Cell> row1 : rel1.getRows()) {
             for (List<Cell> row2 : rel2.getRows()) {
-                if (p.check(row1) && p.check(row2)) {
-                    List<Cell> joinRow = new ArrayList<>(row1);
-                    joinRow.addAll(row2);
-                    joinRows.add(joinRow);
-                }
+                List<Cell> cartesianRow = new ArrayList<>(row1);
+                cartesianRow.addAll(row2);
+                cartesianRows.add(cartesianRow);
             }
         }
 
-        Relation joinResult = rb.newRelation("Join Result", joinAttrs, joinTypes);
-        System.out.println("joinRows: " + joinRows);
-        
-        for (List<Cell> joinRow : joinRows) {
-            joinResult.insert(joinRow);
+        Relation cartesianResult = rb.newRelation("CartesianProduct", cartesianAttrs, cartesianTypes);
+        cartesianResult.getRows().addAll(cartesianRows);
+
+        Relation thetaJoinResult = rb.newRelation("Theta Join Result", cartesianAttrs, cartesianTypes);
+
+        for (List<Cell> row : cartesianResult.getRows()) {
+            if (p.check(row)) {
+                thetaJoinResult.insert(row);
+            }
         }
 
-        return joinResult;
+        return thetaJoinResult;
     }
 }
