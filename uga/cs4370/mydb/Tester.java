@@ -331,5 +331,29 @@ public class Tester {
         Relation filteredResult = ra.project(filterForStudent, attrsToInclude);
 
         filteredResult.print();
+
+        /*
+         * Query for question four
+         */
+        Predicate predicateFour = new PredicateImpl(2, 2, PredicateImpl.ComparisonOperator.GREATER_THAN);
+        Relation filteredCourses = ra.select(coursesRel, predicateFour);
+
+        Relation professorsTeachesJoin = ra.join(professorsRel, teachesRel);
+
+        Relation queryFourJoin = ra.join(professorsTeachesJoin, filteredCourses);
+
+        List<String> projectAttrs = Arrays.asList("ProfessorID", "FName", "LName");
+        Relation queryFourResult = ra.project(queryFourJoin, projectAttrs);
+        queryFourResult.print();
+
+        /*
+         * Query for question five
+         */
+
+
+         /*
+          * 
+          */
+         
     }
 }
