@@ -352,8 +352,17 @@ public class Tester {
 
 
          /*
-          * 
-          */
-         
+          * Query for question six
+          */         
+          List<String> attrsToInclude2 = Arrays.asList("CourseID", "CName");
+          Relation projectedCourses = ra.project(coursesRel, attrsToInclude2);
+
+          Relation courseAndTeaches = ra.join(coursesRel, teachesRel);
+          Relation projectedJoin = ra.project(courseAndTeaches, attrsToInclude2);
+
+          Relation difference = ra.diff(projectedCourses, projectedJoin);
+          difference.print();
+
+
     }
 }
